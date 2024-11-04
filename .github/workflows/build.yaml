@@ -8,7 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-environment:
+  build-plugin:
+    needs: build-babeltrace
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -19,14 +20,7 @@ jobs:
           sudo apt-add-repository ppa:lttng/stable-2.13 -y
           sudo apt-get update
           sudo apt-get install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
-
-  build-babeltrace:
-    needs: setup-environment
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
+      
       - name: Build Babeltrace2 from Source
         run: |
           mkdir -p external && cd external
@@ -35,13 +29,6 @@ jobs:
           BABELTRACE_DEV_MODE=1 BABELTRACE_MINIMAL_LOG_LEVEL=TRACE ./configure --disable-debug-info
           make -j$(nproc)
           sudo make install
-
-  build-plugin:
-    needs: build-babeltrace
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
 
       - name: Build Plugin
         run: |
