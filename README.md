@@ -1,6 +1,6 @@
 # ROS2 Tracing C++
 
-ROS2 Tracing C++ is a custom plugin for `babeltrace2` to speed up trace-processing for ROS2 nodes.
+ROS2 Tracing C++ is a custom plugin for babeltrace2 to speed up trace-processing for ROS2 nodes.
 
 <p align="center">
         <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS2 Tracing C++" width="600"/>
@@ -9,7 +9,14 @@ ROS2 Tracing C++ is a custom plugin for `babeltrace2` to speed up trace-processi
         Callback execution time plot generated using ROS2 Tracing C++
 </p>
 
-Trace analysis is incredibly powerful. However, processing traces with ROS2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ plugin which uses the same mechanism of analyzing tracing, but is incredibly performance optimized.
+Trace analysis is incredibly powerful. However, processing traces with ROS2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ babeltrace2 plugin which uses the same mechanism of analyzing tracing but with much greater performance. As a rule of thumb, speedups of between **25x and 50x** can be expected. This enables real-time trace processing. 
+
+<p align="center">
+        <img src="https://github.com/user-attachments/assets/ea88a38f-8930-40da-95a4-98e1a7485696" alt="Speed comparision between ros2 tracing and ros2 tracing c++" width="300" />
+</p>
+<p align="center">
+        Both plots are times to analyze 2 minutes of trace collections on the Cavalier Autonomous Racing stack. There is a speedup of 52.1 times greater and 20.9 times for the memory usage and callback duration calculator, respectively.
+</p>
 
 ## Alternatives to ROS2 Tracing C++
 
