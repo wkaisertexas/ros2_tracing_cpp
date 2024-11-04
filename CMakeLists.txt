@@ -9,10 +9,9 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(BABELTRACE2 REQUIRED babeltrace2)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BABELTRACE2_CFLAGS} -fPIC")
 
-add_library(trace_analysis SHARED src/plugin.cpp src/callback_durations.cpp src/callback_durations.hpp src/memory_usage.cpp src/memory_usage.hpp)
+add_library(trace_analysis SHARED src/plugin.cpp src/callback_duration.cpp src/callback_duration.hpp src/memory_usage.cpp src/memory_usage.hpp)
 
 target_link_libraries(trace_analysis ${BABELTRACE2_LIBRARIES})
 
