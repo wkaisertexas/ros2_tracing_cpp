@@ -4,6 +4,13 @@ ROS2 Tracing CPP is a custom plugin for `babeltrace2` to speed up trace-processi
 
 Trace analysis is incredibly powerful. However, processing traces with ROS2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ plugin which uses the same mechanism of analyzing tracing, but is incredibly performance optimized.
 
+## Alternatives to ROS2 Tracing CPP
+
+There exist other tracetools analysis solutions for ROS2
+
+- [ROS2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble) is a good choice if you do not need high-performance trace analysis.
+- [LTTNG Analyses](https://github.com/lttng/lttng-analyses) have good examples of trace-analysis scripts written in Python if you are looking to learn more about what you can get from trace-analysis.
+
 ## Supported Analysis Sinks
 
 The supported features are inspired by the [ROS2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble).
@@ -24,16 +31,13 @@ Installation requires four steps:
 
 ### Installing LTTNG
 
-Install lttng from (lttng.org/docs/v2.13/#doc-ubuntu-ppa):
+Install lttng from [the Linux PPA package](lttng.org/docs/v2.13/#doc-ubuntu-ppa):
 
 ```bash
 sudo apt-add-repository ppa:lttng/stable-2.13
 sudo apt-get update
 sudo apt install lttng-tools lttng-modules-dkms liblttng-ust-dev
 ```
-
-> [!WARNING]
-> the lttng install on the deepracing lambda is broken for some reason
 
 ### Installing ROS2 TraceTools
 
@@ -43,10 +47,10 @@ Installing tracetools requires apt installing the `tracetools-launch` package an
 apt install ros-humble-tracetools-launch
 (cd external && git clone https://github.com/ros2/ros2_tracing && cd ros2_tracing && git checkout humble)
 colcon build --packages-up-to tracetools
-source install/setup.sh # run this before building any other packages
+source install/setup.sh
 ```
 
-This will add tracepoints to allow callback duration to be measured.
+After this, you can build your packages with `colcon` like normal.
 
 ### Building Babeltrace2 from source
 

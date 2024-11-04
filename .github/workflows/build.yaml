@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 jobs:
   setup-environment:
@@ -18,15 +19,6 @@ jobs:
           sudo apt-add-repository ppa:lttng/stable-2.13 -y
           sudo apt-get update
           sudo apt-get install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
-
-      - name: Set up ROS2 Tracetools
-        run: |
-          sudo apt-get update && sudo apt install -y ros-humble-tracetools-launch
-          mkdir -p external && cd external
-          git clone https://github.com/ros2/ros2_tracing && cd ros2_tracing
-          git checkout humble
-          colcon build --packages-up-to tracetools
-          source install/setup.sh
 
   build-babeltrace:
     needs: setup-environment
