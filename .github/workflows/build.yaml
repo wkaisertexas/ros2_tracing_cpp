@@ -9,7 +9,6 @@ on:
 
 jobs:
   build-plugin:
-    needs: build-babeltrace
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
