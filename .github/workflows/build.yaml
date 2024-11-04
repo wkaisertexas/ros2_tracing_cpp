@@ -37,6 +37,6 @@ jobs:
 
       - name: Verify Plugins Built Successfully
         run: |
-          if [ ! -f build/plugins/libcallback_duration.so ] || [ ! -f build/plugins/libmemory_usage.so ]; then
+          if [ ! -f build/plugins/libros2_tracing_cpp.so ]; then
             echo "Plugin build failed!" && exit 1
           fi
