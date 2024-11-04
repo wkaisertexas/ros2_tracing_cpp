@@ -4,23 +4,24 @@ project(babeltrace2_plugins)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Release)
+set(POSITION_INDEPENDENT_CODE ON)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(BABELTRACE2 REQUIRED babeltrace2)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BABELTRACE2_CFLAGS} -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BABELTRACE2_CFLAGS}")
 
-add_library(trace_analysis SHARED src/plugin.cpp src/callback_duration.cpp src/callback_duration.hpp src/memory_usage.cpp src/memory_usage.hpp)
+add_library(ros2_tracing_cpp SHARED src/plugin.cpp)
 
-target_link_libraries(trace_analysis ${BABELTRACE2_LIBRARIES})
+target_link_libraries(ros2_tracing_cpp ${BABELTRACE2_LIBRARIES})
 
-target_include_directories(trace_analysis PRIVATE ${BABELTRACE2_INCLUDE_DIRS})
+target_include_directories(ros2_tracing_cpp PRIVATE ${BABELTRACE2_INCLUDE_DIRS})
 
-set_target_properties(trace_analysis PROPERTIES OUTPUT_NAME "trace_analysis")
+set_target_properties(ros2_tracing_cpp PROPERTIES OUTPUT_NAME "ros2_tracing_cpp")
 
 set(CMAKE_INSTALL_PREFIX /usr)
-install(TARGETS trace_analysis LIBRARY DESTINATION lib/babeltrace2/plugins/)
+install(TARGETS ros2_tracing_cpp LIBRARY DESTINATION lib/babeltrace2/plugins/)
 
 include(CPack)
 

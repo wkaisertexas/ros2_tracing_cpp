@@ -5,7 +5,7 @@
 BT_PLUGIN_MODULE();
 
 /* Define the `trace_analysis` plugin */
-BT_PLUGIN(trace_analysis);
+BT_PLUGIN(ros2_tracing_cpp);
 
 /* Author Information */
 BT_PLUGIN_DESCRIPTION("ROS2 trace processing sinks");
@@ -26,7 +26,7 @@ BT_PLUGIN_SINK_COMPONENT_CLASS_GRAPH_IS_CONFIGURED_METHOD(memory_usage,
 
 /* Define the `callback_duration` sink component class */
 BT_PLUGIN_SINK_COMPONENT_CLASS(callback_duration, callback_durations_consume);
-BT_PLUGIN_SINK_COMPONENT_CLASS_DESCRIPTION(memory_usage,
+BT_PLUGIN_SINK_COMPONENT_CLASS_DESCRIPTION(callback_duration,
     "Computes the callback durations of ROS 2 nodes");
 
 /* Set some of the `output` sink component class's optional methods */
