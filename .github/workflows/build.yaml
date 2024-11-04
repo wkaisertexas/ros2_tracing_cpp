@@ -1,0 +1,64 @@
+name: ROS2 Tracing CPP Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  setup-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up LTTNG
+        run: |
+          sudo apt-add-repository ppa:lttng/stable-2.13 -y
+          sudo apt-get update
+          sudo apt-get install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
+
+      - name: Set up ROS2 Tracetools
+        run: |
+          sudo apt-get update && sudo apt install -y ros-humble-tracetools-launch
+          mkdir -p external && cd external
+          git clone https://github.com/ros2/ros2_tracing && cd ros2_tracing
+          git checkout humble
+          colcon build --packages-up-to tracetools
+          source install/setup.sh
+
+  build-babeltrace:
+    needs: setup-environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Build Babeltrace2 from Source
+        run: |
+          mkdir -p external && cd external
+          curl -L https://www.efficios.com/files/babeltrace/babeltrace2-2.0.6.tar.bz2 -o babeltrace.tar.bz2
+          tar -xvf babeltrace.tar.bz2 && cd babeltrace2-*
+          BABELTRACE_DEV_MODE=1 BABELTRACE_MINIMAL_LOG_LEVEL=TRACE ./configure --disable-debug-info
+          make -j$(nproc)
+          sudo make install
+
+  build-plugin:
+    needs: build-babeltrace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Build Plugin
+        run: |
+          mkdir -p build && cd build
+          cmake ..
+          make -j$(nproc)
+
+      - name: Verify Plugins Built Successfully
+        run: |
+          if [ ! -f build/plugins/libcallback_duration.so ] || [ ! -f build/plugins/libmemory_usage.so ]; then
+            echo "Plugin build failed!" && exit 1
+          fi

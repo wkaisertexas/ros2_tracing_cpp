@@ -4,14 +4,14 @@ ROS2 Tracing CPP is a custom plugin for `babeltrace2` to speed up trace-processi
 
 Trace analysis is incredibly powerful. However, processing traces with ROS2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ plugin which uses the same mechanism of analyzing tracing, but is incredibly performance optimized.
 
-## Supported Plugins
+## Supported Analysis Sinks
 
 The supported features are inspired by the [ROS2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble).
 
-| Plugin | Library | Source File | Required Tracepoints | Description |
-| :----- | :------ | :---------- | :------------------- | :---------- |
-| `sink.callback_duration.output` | `libcallback_duration.so` | `src/callback_duration.cpp` |`ros2:rclcpp_callback_register`, `ros2:callback_start`, `ros2:callback_end` | Collects the duration of each callback triggered |
-| `sink.memory_usage.output` | `lipmemory_usage.so` | `src/memory_usage.cpp` | `lttng_ust_libc:malloc`, `lttng_ust_libc:calloc`, `lttng_ust_libc:realloc`, `lttng_ust_libc:memalign`, `lttng_ust_libc:posix_memalign`, `lttng_ust_libc:free` | Gets information about the lifecycle of objects allocated by nodes |
+| Plugin | Required Tracepoints | Description |
+| :----- | :------------------- | :---------- |
+| `sink.callback_duration.output` | `ros2:rclcpp_callback_register`, `ros2:callback_start`, `ros2:callback_end` | Collects the duration of each callback triggered |
+| `sink.memory_usage.output` | `lttng_ust_libc:malloc`, `lttng_ust_libc:calloc`, `lttng_ust_libc:realloc`, `lttng_ust_libc:memalign`, `lttng_ust_libc:posix_memalign`, `lttng_ust_libc:free` | Gets information about the lifecycle of objects allocated by nodes |
 
 ## Installation
 
@@ -76,6 +76,38 @@ make -j$(nproc)
 ```
 
 At this point, the plugins will be built in `build/plugins` where you can reference them to build the trace analysis compute graph.
+
+## Collecting traces
+
+With `tracetools-launch` installed, you can add the following to your launch file to collect traces.
+
+```python
+from launch import LaunchDescription
+
+from tracetools_launch.action import Trace
+
+CALLBACK_TRACEPOINTS = ["ros2:rclcpp_callback_register", "ros2:callback_start", "ros2:callback_end"]
+"""Tracepoints required for callback duration analysis"""
+MEMORY_TRACEPOINTS = ["lttng_ust_libc:malloc", "lttng_ust_libc:calloc", "lttng_ust_libc:realloc", "lttng_ust_libc:memalign", "lttng_ust_libc:posix_memalign", "lttng_ust_libc:free"]
+"""Tracepoints required for memory usage analysis"""
+
+def generate_launch_description() -> LaunchDescription:
+    tracepoints_to_collect = CALLBACK_TRACEPOINTS + MEMORY_TRACEPOINTS
+    trace_session = Trace(
+        session_name="callback_duration_and_memory_usage",
+        events_ust=",".join(tracepoints_to_collect),
+        base_path="~/.ros/tracing", # default trace location
+    )
+
+    # the rest of your launch file
+
+    return LaunchDescription([
+        trace_session,
+        # your nodes and parameteres
+    ])
+```
+
+This launch command will create `~/.ros/tracing/callback_duration_and_memory_usage` which contains several nested folders. Pointing `Babeltrace2` at `~/.ros/tracing/callback_duration_and_memory_usage` will allow for trace analysis.
 
 ## Running the plugins
 
@@ -143,15 +175,13 @@ Looking at a profile of this plugin, iterating through the traces with babeltrac
 
 ![Perf Trace of `memory_usage`](./scripts/imgs/perf_data.png)
 
-You can see from a `perf` recording of this program that non-plugin processing time takes up the vast majority of total processing time.
-
 > [!IMPORTANT]
-> If you want to speed up processing time, you can use a live session created with `lltng create my-session --live` and `babeltrace2 --plugin-path . --input-format=lttng-live net://localhost/host/localhost/my-session --component=sink.callback_duration.output`
+> If you want to speed up processing time, consider using a live session created with `llttng create my-session --live` and `babeltrace2 --plugin-path . --input-format=lttng-live net://localhost/host/localhost/my-session --component=sink.callback_duration.output`
 
 ## Resources
 
 1. [Babeltrace 2 Sink Example](https://babeltrace.org/docs/v2.0/libbabeltrace2/example-simple-sink-cmp-cls.html)
-2. [ROS2 trace analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble)
-3. [LTTNG documentation](https://lttng.org/docs/v2.13/)
-4. [ROS2 tracing whitepaper](https://arxiv.org/abs/2201.00393)
-5. [ROS2 tracing github](https://github.com/ros2/ros2_tracing/tree/humble)
+2. [ROS2 Trace Analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble)
+3. [LTTNG Documentation](https://lttng.org/docs/v2.13/)
+4. [ROS2 Tracing Whitepaper](https://arxiv.org/abs/2201.00393)
+5. [ROS2 Tracing Github](https://github.com/ros2/ros2_tracing/tree/humble)
