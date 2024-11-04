@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+    release:
+    types:
+      - published
 
 jobs:
   build-plugin:
@@ -40,3 +43,16 @@ jobs:
           if [ ! -f build/plugins/libros2_tracing_cpp.so ]; then
             echo "Plugin build failed!" && exit 1
           fi
+
+  create-release:
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    needs: build-plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload Plugin to Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: build/plugins/libros2_tracing_cpp.so
+          tag: ${{ github.ref }}
+          allowUpdates: true
