@@ -2,10 +2,12 @@
 
 ROS2 Tracing C++ is a custom plugin for `babeltrace2` to speed up trace-processing for ROS2 nodes.
 
-<figure align="center">
-    <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS2 Tracing C++" width="400">
-    <figcaption>Callback execution time plot generated using ROS2 Tracing C++</figcaption>
-</figure>
+<p align="center">
+        <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS2 Tracing C++" width="600"/>
+</p>
+<p align="center">
+        Callback execution time plot generated using ROS2 Tracing C++
+</p>
 
 Trace analysis is incredibly powerful. However, processing traces with ROS2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ plugin which uses the same mechanism of analyzing tracing, but is incredibly performance optimized.
 
