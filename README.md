@@ -1,6 +1,6 @@
 # ROS2 Tracing C++
 
-ROS2 Tracing C++ is a custom plugin for babeltrace2 to speed up trace-processing for ROS2 nodes.
+ROS2 Tracing C++ is a custom babeltrace2 plugin to speed up trace-processing for ROS2 C++ nodes.
 
 <p align="center">
         <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS2 Tracing C++" width="600"/>
@@ -31,17 +31,21 @@ The supported features are inspired by the [ROS2 tracing analysis](https://githu
 
 | Plugin | Required Tracepoints | Description |
 | :----- | :------------------- | :---------- |
-| `sink.trace_analysis.callback_duration` | `ros2:rclcpp_callback_register`, `ros2:callback_start`, `ros2:callback_end` | Collects the duration of each callback triggered |
-| `sink.trace_analysis.memory_usage` | `lttng_ust_libc:malloc`, `lttng_ust_libc:calloc`, `lttng_ust_libc:realloc`, `lttng_ust_libc:memalign`, `lttng_ust_libc:posix_memalign`, `lttng_ust_libc:free` | Gets information about the lifecycle of objects allocated by nodes |
+| `sink.ros2_tracing_cpp.callback_duration` | `ros2:rclcpp_callback_register`, `ros2:callback_start`, `ros2:callback_end` | Collects the duration of each callback triggered |
+| `sink.ros2_tracing_cpp.memory_usage` | `lttng_ust_libc:malloc`, `lttng_ust_libc:calloc`, `lttng_ust_libc:realloc`, `lttng_ust_libc:memalign`, `lttng_ust_libc:posix_memalign`, `lttng_ust_libc:free` | Gets information about the lifecycle of objects allocated by nodes |
 
 ## Installation
 
-To use ROS2 Tracing C++, four steps are required:
+To use ROS2 Tracing C++, you must first:
 
 1. installing the Linux Trace Toolkit: next generation(LTTNG)
 2. installing ros2 tracetools and building your code with tracing enabled
+3. download and move the plugin from the releases page
+
+If you want to build from source, you then must
+
 3. building `babeltrace2` from source
-4. building the plugin `libtrace_analysis.so`
+4. building the plugin `libros2_tracing_cpp.so`
 
 ### Installing LTTNG
 
@@ -68,6 +72,19 @@ After this, you can build your packages with `colcon` like normal.
 
 > [!WARNING]
 > However, you must `source install/setup.sh` before building any of the other packages you want tracepoints enabled in. This is very atypical for a ROS2 project, but is a valid workaround to building with tracepoints enabled while not requiring a from-source ROS2 build.
+
+### Downloading the ROS2 Tracing C++ Plugin from the Latest GitHub Release
+
+If you are running on a x86 system, you can [download the latest release binary](https://github.com/wkaisertexas/ros2_tracing_cpp/releases/latest).
+
+```bash
+wget https://github.com/wkaisertexas/ros2_tracing_cpp/releases/download/v1/libros2_tracing_cpp.so
+mkdir -p /usr/local/lib/babeltrace2/plugins
+sudo cp libros2_tracing_cpp.so /usr/local/lib/babeltrace2/plugins
+```
+
+> [!NOTE]
+> Moving `libros2_tracing_cpp.so` into `/usr/local/lib/babeltrace2/plugins` is not required. However, this allows these trace analysis sinks to be used **without** specifying the `--plugin-path`
 
 ### Building Babeltrace2 from Source
 
@@ -102,9 +119,10 @@ mkdir build
 cd build
 cmake ..
 make -j$(nproc)
+sudo make install
 ```
 
-At this point, the plugin will be built in `build/plugins/libtrace_analysis.so` where you can reference the different sinks to process your traces.
+At this point, the plugin will be built in `build/plugins/libros2_tracing_cpp.so` where you can reference the different sinks to process your traces.
 
 ## Collecting Traces with ROS2 TraceTools Launch
 
@@ -152,8 +170,8 @@ For each sink, there is a pre-built Jupyter notebook which makes a standard set 
 
 | Plugin | Jupyter Notebook |
 | :----- | :--------------- |
-| `sink.trace_analysis.callback_duration` | [process_callback_duration.ipynb](./scripts/process_callback_duration.ipynb) |
-| `sink.trace_analysis.memory_usage` | [process_callback_duration.ipynb](./scripts/process_memory_usage.ipynb) |
+| `sink.ros2_tracing_cpp.callback_duration` | [process_callback_duration.ipynb](./scripts/process_callback_duration.ipynb) |
+| `sink.ros2_tracing_cpp.memory_usage` | [process_callback_duration.ipynb](./scripts/process_memory_usage.ipynb) |
 
 ## Processing Outputs
 
