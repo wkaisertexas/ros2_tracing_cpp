@@ -44,13 +44,13 @@ jobs:
           fi
 
       - name: Upload Plugin as Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: plugin
           path: build/plugins/libros2_tracing_cpp.so
 
   create-release:
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/main'
     needs: build-plugin
     runs-on: ubuntu-latest
     steps:
