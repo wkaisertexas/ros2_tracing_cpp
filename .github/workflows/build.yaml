@@ -65,5 +65,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: build/plugins/libros2_tracing_cpp.so
-          tag: ${{ github.event.release.tag_name }}
+          # tag: ${{ github.event.release.tag_name }}
+          tag: v1
           allowUpdates: true
