@@ -25,6 +25,9 @@ There exist other trace analysis solutions for ROS2
 - [ROS2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble) is a good choice if you do not need high-performance trace analysis.
 - [LTTNG Analyses](https://github.com/lttng/lttng-analyses) have good examples of trace-analysis scripts written in Python if you are looking to learn more about what you can get from trace-analysis.
 
+> [!IMPORTANT]
+> Ros2 tracing and the associated tooling is quite good. Consider analyzing traces with that first as it is quick to get started. If your traces process in a reasonable amount of time, you likely do not need to use this package.
+
 ## Supported Analysis Sinks
 
 The supported features are inspired by the [ROS2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble) package.
