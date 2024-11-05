@@ -7,8 +7,7 @@ on:
   pull_request:
   workflow_dispatch:
   release:
-    types:
-      - edited
+    types: [edited]
 
 jobs:
   build-plugin:
@@ -44,15 +43,27 @@ jobs:
             echo "Plugin build failed!" && exit 1
           fi
 
+      - name: Upload Plugin as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: plugin
+          path: build/plugins/libros2_tracing_cpp.so
+
   create-release:
     if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     needs: build-plugin
     runs-on: ubuntu-latest
     steps:
+      - name: Download Plugin Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: plugin
+          path: build/plugins
+
       - name: Upload Plugin to Release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: build/plugins/libros2_tracing_cpp.so
-          tag: ${{ github.ref }}
+          tag: ${{ github.event.release.tag_name }}
           allowUpdates: true
