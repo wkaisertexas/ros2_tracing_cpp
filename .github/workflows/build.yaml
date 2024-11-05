@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
   workflow_dispatch:
-    release:
+  release:
     types:
       - published
 
