@@ -55,10 +55,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Plugin Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: plugin
-          path: build/plugins
+          path: build/plugins/libros2_tracing_cpp.so
 
       - name: Upload Plugin to Release
         uses: ncipollo/release-action@v1
