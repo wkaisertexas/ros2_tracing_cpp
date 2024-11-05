@@ -1,36 +1,36 @@
-# ROS2 Tracing C++
+# ROS 2 Tracing C++
 
-ROS2 Tracing C++ is a custom babeltrace2 plugin to speed up trace-processing for ROS2 C++ nodes.
-
-<p align="center">
-        <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS2 Tracing C++" width="600"/>
-</p>
-<p align="center">
-        Callback execution time plot generated using ROS2 Tracing C++
-</p>
-
-Trace analysis is incredibly powerful. However, processing traces with ROS2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ babeltrace2 plugin which uses the same mechanism of analyzing tracing but with much greater performance. As a rule of thumb, speedups of between **25x and 50x** can be expected. This enables real-time trace processing. 
+ROS 2 Tracing C++ is a custom babeltrace2 plugin to speed up trace-processing for ROS 2 C++ nodes.
 
 <p align="center">
-        <img src="https://github.com/user-attachments/assets/ea88a38f-8930-40da-95a4-98e1a7485696" alt="Speed comparision between ros2 tracing and ros2 tracing c++" width="300" />
+        <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS 2 Tracing C++" width="600"/>
 </p>
 <p align="center">
-        Both plots are times to analyze 2 minutes of trace collections on the Cavalier Autonomous Racing stack. There is a speedup of 52.1 times greater and 20.9 times for the memory usage and callback duration calculator, respectively.
+        Callback execution time plot generated using ROS 2 Tracing C++
 </p>
 
-## Alternatives to ROS2 Tracing C++
+Trace analysis is incredibly powerful. However, processing traces with ROS 2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ babeltrace2 plugin which uses the same mechanism of analyzing tracing but with much greater performance. As a rule of thumb, speedups of between **25x and 50x** can be expected. This enables real-time trace processing. 
 
-There exist other trace analysis solutions for ROS2
+<p align="center">
+        <img src="https://github.com/user-attachments/assets/ea88a38f-8930-40da-95a4-98e1a7485696" alt="Speed comparision between ros 2 tracing and ros 2 tracing c++" width="300" />
+</p>
+<p align="center">
+        Both plots are times to analyze 2 minutes of trace collections on the Cavalier Autonomous Racing stack. There is a speedup of 52.1x and 20.9x for the memory usage and callback duration calculator, respectively.
+</p>
 
-- [ROS2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble) is a good choice if you do not need high-performance trace analysis.
+## Alternatives to ROS 2 Tracing C++
+
+There exist other trace analysis solutions for ROS 2
+
+- [ROS 2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble) is a good choice if you do not need high-performance trace analysis.
 - [LTTNG Analyses](https://github.com/lttng/lttng-analyses) have good examples of trace-analysis scripts written in Python if you are looking to learn more about what you can get from trace-analysis.
 
 > [!IMPORTANT]
-> Ros2 tracing and the associated tooling is quite good. Consider analyzing traces with that first as it is quick to get started. If your traces process in a reasonable amount of time, you likely do not need to use this package.
+> ROS 2 Tracing and the associated tooling is quite good. Consider analyzing traces with that first as it is quick to get started. If your traces process in a reasonable amount of time, you likely do not need to use this package.
 
 ## Supported Analysis Sinks
 
-The supported features are inspired by the [ROS2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble) package.
+The supported features are inspired by the [ROS 2 tracing analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble) package.
 
 | Plugin | Required Tracepoints | Description |
 | :----- | :------------------- | :---------- |
@@ -39,16 +39,16 @@ The supported features are inspired by the [ROS2 tracing analysis](https://githu
 
 ## Installation
 
-To use ROS2 Tracing C++, you must first:
+To use ROS 2 Tracing C++, you must first:
 
 1. installing the Linux Trace Toolkit: next generation(LTTNG)
-2. installing ros2 tracetools and building your code with tracing enabled
+2. installing ros 2 tracetools and building your code with tracing enabled
 3. download and move the plugin from the releases page
 
-If you want to build from source, you then must
+If you want to build ROS 2 Tracing C++ from source, you then must
 
-3. building `babeltrace2` from source
-4. building the plugin `libros2_tracing_cpp.so`
+4. building `babeltrace2` from source
+5. building the plugin `libros2_tracing_cpp.so`
 
 ### Installing LTTNG
 
@@ -60,7 +60,7 @@ sudo apt-get update
 sudo apt install lttng-tools lttng-modules-dkms liblttng-ust-dev
 ```
 
-### Installing ROS2 TraceTools Launch
+### Installing ROS 2 TraceTools Launch
 
 Installing tracetools requires `apt` installing the `tracetools-launch` package and then sourcing the tracetools package **before** building any of the other packages which should be instrumented.
 
@@ -74,9 +74,9 @@ source install/setup.sh
 After this, you can build your packages with `colcon` like normal. 
 
 > [!WARNING]
-> However, you must `source install/setup.sh` before building any of the other packages you want tracepoints enabled in. This is very atypical for a ROS2 project, but is a valid workaround to building with tracepoints enabled while not requiring a from-source ROS2 build.
+> However, you must `source install/setup.sh` before building any of the other packages you want tracepoints enabled in. This is **atypical** for a ROS 2 project, but is a valid workaround to building with tracepoints enabled while not requiring a from-source ROS build.
 
-### Downloading the ROS2 Tracing C++ Plugin from the Latest GitHub Release
+### Downloading the ROS 2 Tracing C++ Plugin from the Latest GitHub Release
 
 If you are running on a x86 system, you can [download the latest release binary](https://github.com/wkaisertexas/ros2_tracing_cpp/releases/latest).
 
@@ -91,7 +91,7 @@ sudo cp libros2_tracing_cpp.so /usr/local/lib/babeltrace2/plugins
 
 ### Building Babeltrace2 from Source
 
-To build a plugin, building from source is required ([see guide](https://babeltrace.org/docs/v2.0/libbabeltrace2/guide-build-bt2-dev.html)). This assumes you have a `.gitignored` directory named `external` for non-source packages.
+To build a plugin, building from source is required ([see guide](https://babeltrace.org/docs/v2.0/libbabeltrace2/guide-build-bt2-dev.html)). This assumes you have a `.gitignore`-d directory named `external` for non-source packages.
 
 ```bash
 # downloading and extracting babeltrace2
@@ -110,9 +110,9 @@ cd ../..
 
 After that, `babeltrace2` will be built from source and installed.
 
-### Building ROS2 Tracing C++
+### Building ROS 2 Tracing C++
 
-To build the ROS2 Tracing C++ plugin, run:
+To build the ROS 2 Tracing C++ plugin, run:
 
 ```bash
 git clone https://github.com/wkaisertexas/ros2_tracing_cpp
@@ -127,7 +127,7 @@ sudo make install
 
 At this point, the plugin will be built in `build/plugins/libros2_tracing_cpp.so` where you can reference the different sinks to process your traces.
 
-## Collecting Traces with ROS2 TraceTools Launch
+## Collecting Traces with ROS 2 TraceTools Launch
 
 With `tracetools-launch` installed, you can add the following to your launch file to collect traces.
 
@@ -159,12 +159,12 @@ def generate_launch_description() -> LaunchDescription:
 
 This launch command will create `~/.ros/tracing/callback_duration_and_memory_usage` which contains several nested folders. Running `babeltrace2 ~/.ros/tracing/callback_duration_and_memory_usage | less` will print out traces.
 
-## Running the plugins
+## Running the ROS 2 Tracing C++ Plugin
 
-To run the plugin, use babeltrace with the specified plugin path and your tracing session output path.
+To run the plugin, use `babeltrace2` with the specified plugin path and your tracing session output path.
 
 ```bash
-babeltrace2 --plugin-path . /home/autera/.ros/tracing/ros2_tracing_session/ --component=sink.callback_duration.output
+babeltrace2 --plugin-path . ~/.ros/tracing/ros2_tracing_session/ --component=sink.ros2_tracing_cpp.memory_usage
 ```
 
 ## Using the Pre-Built Jupyter Notebooks for Trace Analysis
@@ -235,12 +235,12 @@ Looking at a profile of this plugin, iterating through the traces with babeltrac
 ![Perf Trace of `memory_usage`](./scripts/imgs/perf_data.png)
 
 > [!IMPORTANT]
-> If you want to speed up processing time, consider using a live session created with `llttng create my-session --live` and `babeltrace2 --plugin-path . --input-format=lttng-live net://localhost/host/localhost/my-session --component=sink.callback_duration.output`
+> If you want to speed up processing time, consider using a live session created with `llttng create my-session --live` and `babeltrace2 --plugin-path . --input-format=lttng-live net://localhost/host/localhost/my-session --component=sink.ros2_tracing_cpp.memory_usage`
 
 ## Resources
 
 1. [Babeltrace 2 Sink Example](https://babeltrace.org/docs/v2.0/libbabeltrace2/example-simple-sink-cmp-cls.html)
-2. [ROS2 Trace Analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble)
+2. [ROS 2 Trace Analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble)
 3. [LTTNG Documentation](https://lttng.org/docs/v2.13/)
-4. [ROS2 Tracing Whitepaper](https://arxiv.org/abs/2201.00393)
-5. [ROS2 Tracing Github](https://github.com/ros2/ros2_tracing/tree/humble)
+4. [ROS 2 Tracing Whitepaper](https://arxiv.org/abs/2201.00393)
+5. [ROS 2 Tracing Github](https://github.com/ros2/ros2_tracing/tree/humble)
