@@ -52,6 +52,8 @@ jobs:
   create-release:
     if: github.ref == 'refs/heads/main'
     needs: build-plugin
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Download Plugin Artifact
@@ -65,6 +67,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: build/plugins/libros2_tracing_cpp.so
-          # tag: ${{ github.event.release.tag_name }}
           tag: v1
           allowUpdates: true
