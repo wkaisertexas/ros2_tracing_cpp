@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: plugin
-          path: build/plugins
+          path: build
 
   create-release:
     if: github.ref == 'refs/heads/main'
@@ -71,7 +71,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: plugin
-          path: build/plugins
+          path: build
 
       - name: Upload Plugin to Release
         uses: ncipollo/release-action@v1
