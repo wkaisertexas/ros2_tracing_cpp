@@ -26,7 +26,9 @@ target_link_libraries(ros2_tracing_cpp ${BABELTRACE2_LIBRARIES})
 
 target_include_directories(ros2_tracing_cpp PRIVATE ${BABELTRACE2_INCLUDE_DIRS})
 
-set_target_properties(ros2_tracing_cpp PROPERTIES OUTPUT_NAME "ros2_tracing_cpp")
+set_target_properties(ros2_tracing_cpp PROPERTIES
+    OUTPUT_NAME "ros2_tracing_cpp-${CMAKE_SYSTEM_PROCESSOR}"
+)
 
 set(CMAKE_INSTALL_PREFIX /usr)
 install(TARGETS ros2_tracing_cpp LIBRARY DESTINATION local/lib/babeltrace2/plugins)
@@ -35,7 +37,7 @@ set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_NAME "ros2_tracing_cpp")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_DEBIAN_COMPRESSION_TYPE "gzip")
-set(CPACK_PACKAGE_FILE_NAME "ros2-tracing-cpp")
+set(CPACK_PACKAGE_FILE_NAME "ros2-tracing-cpp-${CMAKE_SYSTEM_PROCESSOR}")
 set(CPACK_PACKAGE_DESCRIPTION "ROS2 tracing C++ plugin")
 set(CPACK_PACKAGE_CONTACT "William Kaiser <wkaisertexas@gmail.com>")
 set(CPACK_RESOURCE_FILE_LICENSE "../LICENSE")
