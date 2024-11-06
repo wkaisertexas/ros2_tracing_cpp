@@ -1,6 +1,6 @@
 # ROS 2 Tracing C++
 
-ROS 2 Tracing C++ is a custom babeltrace2 plugin to speed up trace-processing for ROS 2 C++ nodes.
+ROS 2 Tracing C++ is a custom plugin for babeltrace2 which replaces ROS 2 Tracing for analyzing ROS 2 C++ nodes.
 
 <p align="center">
         <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS 2 Tracing C++" width="600"/>
@@ -9,13 +9,36 @@ ROS 2 Tracing C++ is a custom babeltrace2 plugin to speed up trace-processing fo
         Callback execution time plot generated using ROS 2 Tracing C++
 </p>
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Alternatives to ROS 2 Tracing C++](#alternatives-to-ros-2-tracing-c)
+- [Supported Analysis Sinks](#supported-analysis-sinks)
+- [Running ROS 2 Tracing C++](#running-ros-2-tracing-c)
+- [Analyzing Processed Traces in a Jupyter Notebook](#analyzing-processed-traces-in-a-jupyter-notebook)
+- [Installation Guide](#installation-guide)
+  - [LTTNG Installation](#lttng-and-babeltrace-2-installation)
+  - [ROS 2 TraceTools Launch Installation](#ros-2-tracetools-launch-installation)
+  - [ROS 2 Tracing C++ Installation](#ros-2-tracing-c-installation)
+- [Building from Source](#building-from-source)
+  - [Babeltrace 2 from Source](#babeltrace-2-from-source)
+  - [ROS 2 Tracing C++ from Source](#ros-2-tracing-c-from-source)
+- [Collecting Traces with ROS 2 TraceTools Launch](#collecting-traces-with-ros-2-tracetools-launch)
+- [Sink Output Data Schema](#sink-output-data-schema)
+  - [Callback Duration Products](#callback-duration-products)
+  - [Memory Usage Products](#memory-usage-products)
+- [Improving Trace Processing Time](#improving-trace-processing-time)
+- [Resources](#resources)
+
+## Introduction
+
 Trace analysis is incredibly powerful. However, processing traces with ROS 2 tracing took quite a bit longer than program execution times themselves. As a result, I wrote a custom C++ babeltrace2 plugin which uses the same mechanism of analyzing tracing but with much greater performance. As a rule of thumb, speedups of between **25x and 50x** can be expected. This enables real-time trace processing. 
 
 <p align="center">
-        <img src="https://github.com/user-attachments/assets/ea88a38f-8930-40da-95a4-98e1a7485696" alt="Speed comparision between ros 2 tracing and ros 2 tracing c++" width="300" />
+        <img src="https://github.com/user-attachments/assets/ea88a38f-8930-40da-95a4-98e1a7485696" alt="Speed comparison between ros 2 tracing and ros 2 tracing c++" width="300" />
 </p>
 <p align="center">
-        Both plots are times to analyze 2 minutes of trace collections on the Cavalier Autonomous Racing stack. There is a speedup of 52.1x and 20.9x for the memory usage and callback duration calculator, respectively.
+        Processing times of 2 minutes of real-time trace collection on the Cavalier Autonomous Racing stack. A speedup of 52.1x and 20.9x is achieved for the memory usage and callback duration calculator, respectively.
 </p>
 
 ## Alternatives to ROS 2 Tracing C++
@@ -37,30 +60,46 @@ The supported features are inspired by the [ROS 2 tracing analysis](https://gith
 | `sink.ros2_tracing_cpp.callback_duration` | `ros2:rclcpp_callback_register`, `ros2:callback_start`, `ros2:callback_end` | Collects the duration of each callback triggered |
 | `sink.ros2_tracing_cpp.memory_usage` | `lttng_ust_libc:malloc`, `lttng_ust_libc:calloc`, `lttng_ust_libc:realloc`, `lttng_ust_libc:memalign`, `lttng_ust_libc:posix_memalign`, `lttng_ust_libc:free` | Gets information about the lifecycle of objects allocated by nodes |
 
-## Installation
+## Running ROS 2 Tracing C++
+
+To run the plugin, use `babeltrace2` with the specified plugin path and your tracing session output path.
+
+```bash
+babeltrace2 --plugin-path . ~/.ros/tracing/ros2_tracing_session/ --component=sink.ros2_tracing_cpp.memory_usage
+```
+
+After the trace has been fully processed, a metadata file will be produced for the run and a set of CSV files containing the processed traces. For more information about the format of produced files, see the [Sink Output Data Schema](#sink-output-data-schema) section.
+
+## Analyzing Processed Traces in a Jupyter Notebook
+
+For each sink, there is a pre-built Jupyter notebook which makes a standard set of plots per node. These analyses are designed to be extensible and a good starting point for any future work.
+
+| Plugin | Jupyter Notebook |
+| :----- | :--------------- |
+| `sink.ros2_tracing_cpp.callback_duration` | [process_callback_duration.ipynb](./scripts/process_callback_duration.ipynb) |
+| `sink.ros2_tracing_cpp.memory_usage` | [process_callback_duration.ipynb](./scripts/process_memory_usage.ipynb) |
+
+
+## Installation Guide
 
 To use ROS 2 Tracing C++, you must first:
 
-1. installing the Linux Trace Toolkit: next generation(LTTNG)
-2. installing ros 2 tracetools and building your code with tracing enabled
+1. install [Linux Trace Toolkit: next generation (LTTNG)](https://lttng.org/docs/) and [Babeltrace 2](https://babeltrace.org/#bt2-get)
+2. install ROS 2 Tracetools Launch and rebuild your code
 3. download and move the plugin from the releases page
 
-If you want to build ROS 2 Tracing C++ from source, you then must
+### LTTNG and Babeltrace 2 Installation
 
-4. building `babeltrace2` from source
-5. building the plugin `libros2_tracing_cpp.so`
-
-### Installing LTTNG
-
-Install LTTNG from [the stable Linux PPA package](lttng.org/docs/v2.13/#doc-ubuntu-ppa):
+Install LTTNG and Babeltrace 2 from [the stable Linux PPA package](lttng.org/docs/v2.13/#doc-ubuntu-ppa):
 
 ```bash
 sudo apt-add-repository ppa:lttng/stable-2.13
 sudo apt-get update
-sudo apt install lttng-tools lttng-modules-dkms liblttng-ust-dev
+sudo apt install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
+sudo apt install -y babeltrace2
 ```
 
-### Installing ROS 2 TraceTools Launch
+### ROS 2 TraceTools Launch Installation
 
 Installing tracetools requires `apt` installing the `tracetools-launch` package and then sourcing the tracetools package **before** building any of the other packages which should be instrumented.
 
@@ -74,11 +113,11 @@ source install/setup.sh
 After this, you can build your packages with `colcon` like normal. 
 
 > [!WARNING]
-> However, you must `source install/setup.sh` before building any of the other packages you want tracepoints enabled in. This is **atypical** for a ROS 2 project, but is a valid workaround to building with tracepoints enabled while not requiring a from-source ROS build.
+> However, you must `source install/setup.sh` before building any of the other packages you want tracepoints enabled in. This is **atypical** for a ROS 2 project but is a valid workaround to building with tracepoints enabled while not requiring a from-source ROS build.
 
-### Downloading the ROS 2 Tracing C++ Plugin from the Latest GitHub Release
+### ROS 2 Tracing C++ Installation
 
-If you are running on a x86 system, you can [download the latest release binary](https://github.com/wkaisertexas/ros2_tracing_cpp/releases/latest).
+If you are running on a x86 system, you can [download the latest release binary](https://github.com/wkaisertexas/ros2_tracing_cpp/releases/latest) from the GitHub release.
 
 ```bash
 wget https://github.com/wkaisertexas/ros2_tracing_cpp/releases/download/v1/libros2_tracing_cpp.so
@@ -89,7 +128,14 @@ sudo cp libros2_tracing_cpp.so /usr/local/lib/babeltrace2/plugins
 > [!NOTE]
 > Moving `libros2_tracing_cpp.so` into `/usr/local/lib/babeltrace2/plugins` is not required. However, this allows these trace analysis sinks to be used **without** specifying the `--plugin-path`
 
-### Building Babeltrace2 from Source
+## Building from Source
+
+Building ROS 2 Tracing C++ from source requires:
+
+1. build `babeltrace2` from source
+2. build the plugin `libros2_tracing_cpp.so`
+
+### Babeltrace 2 from Source
 
 To build a plugin, building from source is required ([see guide](https://babeltrace.org/docs/v2.0/libbabeltrace2/guide-build-bt2-dev.html)). This assumes you have a `.gitignore`-d directory named `external` for non-source packages.
 
@@ -110,9 +156,9 @@ cd ../..
 
 After that, `babeltrace2` will be built from source and installed.
 
-### Building ROS 2 Tracing C++
+### ROS 2 Tracing C++ from Source
 
-To build the ROS 2 Tracing C++ plugin, run:
+To build the ROS 2 Tracing C++ plugin from source, run:
 
 ```bash
 git clone https://github.com/wkaisertexas/ros2_tracing_cpp
@@ -159,30 +205,13 @@ def generate_launch_description() -> LaunchDescription:
 
 This launch command will create `~/.ros/tracing/callback_duration_and_memory_usage` which contains several nested folders. Running `babeltrace2 ~/.ros/tracing/callback_duration_and_memory_usage | less` will print out traces.
 
-## Running the ROS 2 Tracing C++ Plugin
-
-To run the plugin, use `babeltrace2` with the specified plugin path and your tracing session output path.
-
-```bash
-babeltrace2 --plugin-path . ~/.ros/tracing/ros2_tracing_session/ --component=sink.ros2_tracing_cpp.memory_usage
-```
-
-## Using the Pre-Built Jupyter Notebooks for Trace Analysis
-
-For each sink, there is a pre-built Jupyter notebook which makes a standard set of plots per node. These analyses are designed to be extensible and a good starting point for any future work.
-
-| Plugin | Jupyter Notebook |
-| :----- | :--------------- |
-| `sink.ros2_tracing_cpp.callback_duration` | [process_callback_duration.ipynb](./scripts/process_callback_duration.ipynb) |
-| `sink.ros2_tracing_cpp.memory_usage` | [process_callback_duration.ipynb](./scripts/process_memory_usage.ipynb) |
-
-## Processing Outputs
+## Sink Output Data Schema
 
 In this section, notes and helpful tips to process outputs generated by each plugin is included.
 
-### Callback Duration
+### Callback Duration Products
 
-For callback duration, you get a `metadata.csv` file which contains links and metadata to a bunch of `callback_*.csv` files. There is a script called `scripts/process_callback_duration.ipynb` which makes callback duration plots using the recording information
+For files produced by `callback_duration`, a `callback_duration_metadata.csv` file which contains links and metadata to `callback_*.csv` files is produced. A script called [`scripts/process_callback_duration.ipynb`](./scripts/process_callback_duration.ipynb) makes callback duration plots using the collected traces.
 
 | Column | Description |
 | :----- | :---------- |
@@ -203,9 +232,9 @@ The file contained in the path variable is a CSV file. The first two rows are th
 > [!TIP]
 > If you are processing this in Pandas, you can use `pd.read_csv(path, skiprows=2)` to ignore the header
 
-### Memory Usage
+### Memory Usage Products
 
-For the memory usage calculator, the memory usage will produce a metadata file with the following information:
+Files produced by `memory_usage`, you get a `memory_usage_metadata.csv` file which contains links and metadata to `mem_*.csv` files. A script called [`scripts/process_memory_usage.ipynb`](./scripts/process_memory_usage.ipynb) makes a 2x2 grid of plots examining allocations over time and the relative frequency of allocations of differing sizes.
 
 | Columns | Description |
 | :------ | :---------- |
@@ -228,14 +257,14 @@ The file contained in the `path` variable is a CSV file containing the following
 | `size` | The size of the allocation in bytes |
 | `vtid` | The virtual thread id which called the allocator | 
 
-## Trace Analysis is Taking a Long Time
+## Improving Trace Processing Time
 
-Looking at a profile of this plugin, iterating through the traces with babeltrace2 takes **over 85% of total time**. Therefore, collecting the minimal set of events required to use each plugin is the single-greatest tactic you can use to reduce program execution time.
+Looking at a profile of this plugin, iterating through the traces with babeltrace2 takes **over 85% of total time**. Collecting the minimal set of events required for each plugin is the single-greatest tactic for reducing program execution time.
 
 ![Perf Trace of `memory_usage`](./scripts/imgs/perf_data.png)
 
 > [!IMPORTANT]
-> If you want to speed up processing time, consider using a live session created with `llttng create my-session --live` and `babeltrace2 --plugin-path . --input-format=lttng-live net://localhost/host/localhost/my-session --component=sink.ros2_tracing_cpp.memory_usage`
+> To speed up processing time, consider using a live session created with `llttng create my-session --live` and `babeltrace2 --plugin-path . --input-format=lttng-live net://localhost/host/localhost/my-session --component=sink.ros2_tracing_cpp.memory_usage`
 
 ## Resources
 
@@ -244,7 +273,7 @@ Looking at a profile of this plugin, iterating through the traces with babeltrac
 3. [LTTNG Documentation](https://lttng.org/docs/v2.13/)
 4. [ROS 2 Tracing Whitepaper](https://arxiv.org/abs/2201.00393)
 5. [ROS 2 Tracing Overhead Evaluation](https://github.com/christophebedard/ros2_tracing-overhead-evaluation)
-6. [ROS 2 Tracing Github](https://github.com/ros2/ros2_tracing/tree/humble)
+6. [ROS 2 Tracing GitHub](https://github.com/ros2/ros2_tracing/tree/humble)
 
 > [!NOTE]
 > If you liked this repository, please consider giving it a star!

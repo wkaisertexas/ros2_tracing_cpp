@@ -81,7 +81,7 @@ static void callback_duration_finalize(bt_self_component_sink *self_component_si
   auto *callback_duration = (struct CallbackDuration *)bt_self_component_get_data(
       bt_self_component_sink_as_self_component(self_component_sink));
 
-  std::ofstream metadataFile("metadata.csv");
+  std::ofstream metadataFile("callback_duration_metadata.csv");
   metadataFile << "symbol,procname,address,count,path,avg_duration" << std::endl;
 
   /* Iterate over the callback durations to create CSV files */
