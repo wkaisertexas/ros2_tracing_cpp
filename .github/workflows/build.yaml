@@ -77,6 +77,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: build/plugins/libros2_tracing_cpp.so
+          artifacts:
+            - build/plugins/libros2_tracing_cpp.so
+            - build/ros2-tracing-cpp.deb
           tag: v1
           allowUpdates: true
