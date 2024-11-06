@@ -12,6 +12,10 @@ on:
 jobs:
   build-plugin:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [x86_64, arm64]
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -21,7 +25,7 @@ jobs:
           sudo apt-add-repository ppa:lttng/stable-2.13 -y
           sudo apt-get update
           sudo apt-get install -y lttng-tools lttng-modules-dkms liblttng-ust-dev
-      
+
       - name: Build Babeltrace2 from Source
         run: |
           mkdir -p external && cd external
@@ -34,15 +38,15 @@ jobs:
       - name: Build Plugin
         run: |
           mkdir -p build && cd build
-          cmake ..
+          cmake -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.architecture }} ..
           make -j$(nproc)
 
       - name: Verify Plugins Built Successfully
         run: |
-          if [ ! -f build/plugins/libros2_tracing_cpp.so ]; then
+          if [ ! -f build/plugins/libros2_tracing_cpp-${{ matrix.architecture }}.so ]; then
             echo "Plugin build failed!" && exit 1
           fi
-      
+
       - name: Building Debian Package
         run: |
           cd build
@@ -50,14 +54,14 @@ jobs:
 
       - name: Verify Plugins Packaged Successfully
         run: |
-          if [ ! -f build/ros2-tracing-cpp.deb ]; then
+          if [ ! -f build/ros2-tracing-cpp-${{ matrix.architecture }}.deb ]; then
             echo "Plugin packaging failed!" && exit 1
           fi
 
       - name: Upload Plugin as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin
+          name: plugin-${{ matrix.architecture }}
           path: build
 
   create-release:
@@ -67,16 +71,18 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Download Plugin Artifact
+      - name: Download Plugin Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: plugin
+          name: plugin-${{ matrix.architecture }}
           path: build
 
       - name: Upload Plugin to Release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "build/plugins/libros2_tracing_cpp.so,build/ros2-tracing-cpp.deb"
+          artifacts: |
+            build/plugins/libros2_tracing_cpp-${{ matrix.architecture }}.so,
+            build/ros2-tracing-cpp-${{ matrix.architecture }}.deb
           tag: v1
           allowUpdates: true
