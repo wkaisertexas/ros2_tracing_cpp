@@ -243,4 +243,8 @@ Looking at a profile of this plugin, iterating through the traces with babeltrac
 2. [ROS 2 Trace Analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble)
 3. [LTTNG Documentation](https://lttng.org/docs/v2.13/)
 4. [ROS 2 Tracing Whitepaper](https://arxiv.org/abs/2201.00393)
-5. [ROS 2 Tracing Github](https://github.com/ros2/ros2_tracing/tree/humble)
+5. [ROS 2 Tracing Overhead Evaluation](https://github.com/christophebedard/ros2_tracing-overhead-evaluation)
+6. [ROS 2 Tracing Github](https://github.com/ros2/ros2_tracing/tree/humble)
+
+> [!NOTE]
+> If you liked this repository, please consider giving it a star!
