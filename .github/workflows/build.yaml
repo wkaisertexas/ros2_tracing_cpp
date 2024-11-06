@@ -50,7 +50,7 @@ jobs:
 
       - name: Verify Plugins Packaged Successfully
         run: |
-          if [ ! -f build/libros2_tracing_cpp.deb ]; then
+          if [ ! -f build/ros2-tracing-cpp.deb ]; then
             echo "Plugin packaging failed!" && exit 1
           fi
 
