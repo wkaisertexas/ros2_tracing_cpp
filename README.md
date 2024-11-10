@@ -191,7 +191,7 @@ def generate_launch_description() -> LaunchDescription:
     tracepoints_to_collect = CALLBACK_TRACEPOINTS | MEMORY_TRACEPOINTS
     trace_session = Trace(
         session_name="callback_duration_and_memory_usage",
-        events_ust=",".join(tracepoints_to_collect),
+        events_ust=list(tracepoints_to_collect),
         base_path="~/.ros/tracing", # default trace location
     )
 
