@@ -28,6 +28,7 @@ ROS 2 Tracing C++ is a custom plugin for babeltrace2 which replaces ROS 2 Tracin
   - [Callback Duration Products](#callback-duration-products)
   - [Memory Usage Products](#memory-usage-products)
 - [Improving Trace Processing Time](#improving-trace-processing-time)
+- [Collecting Traces in Docker](#collecting-traces-in-docker)
 - [Resources](#resources)
 
 ## Introduction
@@ -265,6 +266,16 @@ Looking at a profile of this plugin, iterating through the traces with babeltrac
 
 > [!IMPORTANT]
 > To speed up processing time, consider using a live session created with `llttng create my-session --live` and `babeltrace2 --plugin-path . --input-format=lttng-live net://localhost/host/localhost/my-session --component=sink.ros2_tracing_cpp.memory_usage`
+
+## Collecting Traces in Docker
+
+Collecting traces inside a Docker container requires a non-standard setup. Namely, you **do not** install `lttng-modules-dkms`
+
+```dockerfile
+RUN apt update && apt install -y ros-humble-tracetools-* babeltrace2 lttng-tools liblttng-ust-dev
+```
+
+After this, running your docker image with the `--privileged` flag will allow the collection of both userspace and kernel traces inside the container.
 
 ## Resources
 
