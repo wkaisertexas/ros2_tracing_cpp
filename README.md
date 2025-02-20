@@ -1,6 +1,6 @@
 # ROS 2 Tracing C++
 
-ROS 2 Tracing C++ is a custom plugin for babeltrace2 which replaces ROS 2 Tracing for analyzing ROS 2 C++ nodes.
+A custom plugin for babeltrace2 which replaces [ROS 2 Tracing](https://github.com/ros2/ros2_tracing) for analyzing C++ ROS 2 nodes.
 
 <p align="center">
         <img src="./scripts/imgs/callback_duration.png" alt="Callback duration created by ROS 2 Tracing C++" width="600"/>
@@ -127,7 +127,7 @@ sudo cp libros2_tracing_cpp.so /usr/local/lib/babeltrace2/plugins
 ```
 
 > [!NOTE]
-> Moving `libros2_tracing_cpp.so` into `/usr/local/lib/babeltrace2/plugins` is not required. However, this allows these trace analysis sinks to be used **without** specifying the `--plugin-path`
+> Moving `libros2_tracing_cpp.so` to `/usr/local/lib/babeltrace2/plugins` is optional but allows the trace analysis sinks to be used without specifying `--plugin-path`.
 
 ## Building from Source
 
@@ -183,9 +183,21 @@ from launch import LaunchDescription
 
 from tracetools_launch.action import Trace
 
-CALLBACK_TRACEPOINTS = set(["ros2:rclcpp_callback_register", "ros2:callback_start", "ros2:callback_end"])
+CALLBACK_TRACEPOINTS = set([
+    "ros2:rclcpp_callback_register",
+    "ros2:callback_start",
+    "ros2:callback_end",
+])
 """Tracepoints required for callback duration analysis"""
-MEMORY_TRACEPOINTS = set(["lttng_ust_libc:malloc", "lttng_ust_libc:calloc", "lttng_ust_libc:realloc", "lttng_ust_libc:memalign", "lttng_ust_libc:posix_memalign", "lttng_ust_libc:free"])
+
+MEMORY_TRACEPOINTS = set([
+    "lttng_ust_libc:malloc",
+    "lttng_ust_libc:calloc",
+    "lttng_ust_libc:realloc",
+    "lttng_ust_libc:memalign",
+    "lttng_ust_libc:posix_memalign",
+    "lttng_ust_libc:free"
+])
 """Tracepoints required for memory usage analysis"""
 
 def generate_launch_description() -> LaunchDescription:
@@ -200,7 +212,7 @@ def generate_launch_description() -> LaunchDescription:
 
     return LaunchDescription([
         trace_session,
-        # your nodes and parameteres
+        # your nodes and parameters
     ])
 ```
 
@@ -251,12 +263,12 @@ The file contained in the `path` variable is a CSV file containing the following
 
 | Columns | Description |
 | :------ | :---------- |
-| `type`  | The type of the allocation either `malloc`, `calloc`, `realloc`, `memalign` or `posix_memalign` |
-| `time`  | The time in nanoseconds since the unix epoch the object was allocated |
-| `duration` | How long the memory stuck around. A nan value means that the object was not freed |
-| `prev_size` | The previous allocation size in bytes (only for realloc) |
-| `size` | The size of the allocation in bytes |
-| `vtid` | The virtual thread id which called the allocator | 
+| `type` | type of the allocation either `malloc`, `calloc`, `realloc`, `memalign` or `posix_memalign` |
+| `time` | time in nanoseconds since the unix epoch the object was allocated |
+| `duration` | how long the memory stuck around. A nan value means that the object was not freed |
+| `prev_size` | the previous allocation size in bytes (only for realloc) |
+| `size` | the size of the allocation in bytes |
+| `vtid` | the virtual thread id which called the allocator | 
 
 ## Improving Trace Processing Time
 
@@ -282,7 +294,7 @@ After this, running your docker image with the `--privileged` flag will allow th
 1. [Babeltrace 2 Sink Example](https://babeltrace.org/docs/v2.0/libbabeltrace2/example-simple-sink-cmp-cls.html)
 2. [ROS 2 Trace Analysis](https://github.com/ros-tracing/tracetools_analysis/tree/humble)
 3. [LTTNG Documentation](https://lttng.org/docs/v2.13/)
-4. [ROS 2 Tracing Whitepaper](https://arxiv.org/abs/2201.00393)
+4. [ROS 2 Tracing White Paper](https://arxiv.org/abs/2201.00393)
 5. [ROS 2 Tracing Overhead Evaluation](https://github.com/christophebedard/ros2_tracing-overhead-evaluation)
 6. [ROS 2 Tracing GitHub](https://github.com/ros2/ros2_tracing/tree/humble)
 
