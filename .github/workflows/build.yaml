@@ -42,17 +42,6 @@ jobs:
           if [ ! -f build/plugins/libros2_tracing_cpp.so ]; then
             echo "Plugin build failed!" && exit 1
           fi
-      
-      - name: Building Debian Package
-        run: |
-          cd build
-          cpack
-
-      - name: Verify Plugins Packaged Successfully
-        run: |
-          if [ ! -f build/ros2-tracing-cpp.deb ]; then
-            echo "Plugin packaging failed!" && exit 1
-          fi
 
       - name: Upload Plugin as Artifact
         uses: actions/upload-artifact@v4
@@ -77,6 +66,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "build/plugins/libros2_tracing_cpp.so,build/ros2-tracing-cpp.deb"
+          artifacts: "build/plugins/libros2_tracing_cpp.so"
           tag: v1
           allowUpdates: true
