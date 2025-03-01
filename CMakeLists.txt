@@ -20,7 +20,7 @@ pkg_check_modules(BABELTRACE2 REQUIRED babeltrace2)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BABELTRACE2_CFLAGS}")
 
-add_library(ros2_tracing_cpp SHARED src/plugin.cpp)
+add_library(ros2_tracing_cpp SHARED src/plugin.cpp src/callback_duration.cpp src/memory_usage.cpp)
 
 target_link_libraries(ros2_tracing_cpp ${BABELTRACE2_LIBRARIES})
 
