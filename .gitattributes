@@ -1,0 +1,2 @@
+# prevents GitHub from thinking this is a JuPyter notebok repository due to the embedded graphs
+*.ipynb linguist-generated=true
