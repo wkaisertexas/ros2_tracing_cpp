@@ -41,7 +41,7 @@ void callback_duration_finalize(bt_self_component_sink *self_component_sink) {
 
     std::string s = callback_name;
 
-    /* Sanitize the string for CSV seralization */
+    /* Sanitize the string for CSV serialization */
     size_t pos = 0;
     while ((pos = s.find('"', pos)) != std::string::npos) {
       s.replace(pos, 1, "\"\"");

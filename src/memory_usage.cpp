@@ -7,8 +7,8 @@ bt_component_class_initialize_method_status memory_usage_initialize(
 
   /* Initialize the first event message's index */
   memory_usage->events_index = 1;
-  memory_usage->addr_to_alllocations_idx.reserve(DEFAULT_SIZE);
-  memory_usage->addr_to_alllocations_idx.max_load_factor(0.3);
+  memory_usage->addr_to_allocations_idx.reserve(DEFAULT_SIZE);
+  memory_usage->addr_to_allocations_idx.max_load_factor(0.3);
   memory_usage->allocations.reserve(DEFAULT_SIZE);
 
   // TODO: think about passing data to my configuration with params
@@ -80,7 +80,7 @@ void memory_usage_finalize(bt_self_component_sink *self_component_sink) {
     /* writing the thread id */
     output_file << alloc_info.vtid;
 
-    /* writing a new line (noteable not std::endl) so the buffer is not flushed each time for performance reasons */
+    /* writing a new line (notable not std::endl) so the buffer is not flushed each time for performance reasons */
     output_file << "\n";
   }
 
@@ -216,12 +216,12 @@ void memory_usage_calculator(struct MemoryUsage *memory_usage, const bt_message 
 
     /* Checks whether a previous value was contained in the array in cases where a realloc is present */
     bool should_log_reallocation =
-        alloc_type == AllocationType::REALLOC && memory_usage->addr_to_alllocations_idx.find(pointer_address_value) !=
-                                                     memory_usage->addr_to_alllocations_idx.end();
+        alloc_type == AllocationType::REALLOC && memory_usage->addr_to_allocations_idx.find(pointer_address_value) !=
+                                                     memory_usage->addr_to_allocations_idx.end();
 
     /* Special reallocation case */
     if (should_log_reallocation) {
-      const auto realloc_idx = memory_usage->addr_to_alllocations_idx[pointer_address_value];
+      const auto realloc_idx = memory_usage->addr_to_allocations_idx[pointer_address_value];
       auto &alloc_info = memory_usage->allocations[realloc_idx];
 
       alloc_info.duration = timestamp_ns - alloc_info.time;
@@ -247,7 +247,7 @@ void memory_usage_calculator(struct MemoryUsage *memory_usage, const bt_message 
     node_info.curr_memory += diff_size;
     node_info.max_memory = std::max(node_info.max_memory, node_info.curr_memory);
 
-    memory_usage->addr_to_alllocations_idx[pointer_address_value] = memory_usage->allocations.size();
+    memory_usage->addr_to_allocations_idx[pointer_address_value] = memory_usage->allocations.size();
     memory_usage->allocations.push_back(alloc_info);
 
     return;
@@ -265,7 +265,7 @@ void memory_usage_calculator(struct MemoryUsage *memory_usage, const bt_message 
     const Address pointer_address_value = bt_field_integer_unsigned_get_value(pointer_address_field);
 
     /* Get the past allocation information and set the duration */
-    auto allocation_idx = memory_usage->addr_to_alllocations_idx[pointer_address_value];
+    auto allocation_idx = memory_usage->addr_to_allocations_idx[pointer_address_value];
     if (allocation_idx >= memory_usage->allocations.size()) {
       return;
     }
@@ -276,7 +276,7 @@ void memory_usage_calculator(struct MemoryUsage *memory_usage, const bt_message 
 
     allocation_info.duration = timestamp_ns - allocation_info.time;
     node_info.total_duration += allocation_info.duration;
-    memory_usage->addr_to_alllocations_idx.erase(pointer_address_value);
+    memory_usage->addr_to_allocations_idx.erase(pointer_address_value);
   }
 }
 

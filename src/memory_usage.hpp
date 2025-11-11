@@ -137,7 +137,7 @@ struct MemoryUsage {
   std::unordered_map<VID, NodeInfo> vpid_to_node;
 
   /// Memory address to vpid used to keep track of allocation
-  std::unordered_map<Address, size_t> addr_to_alllocations_idx;
+  std::unordered_map<Address, size_t> addr_to_allocations_idx;
 
   /// Final allocation information logged by pid
   /// NOTE: now that I am thinking about it having such a huge vector may not be the best idea, will look at later
